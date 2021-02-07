@@ -19,10 +19,15 @@ function Header() {
         <Link to="/" className="ml1 no-underline black">
           new
         </Link>
+
         <div className="ml1">|</div>
+
         <Link to="/create" className="ml1 no-underline black">
           submit
         </Link>
+
+        <div className="ml1">|</div>
+
         <div className="flex flex-fixed">
           {authToken ? (
             <div
