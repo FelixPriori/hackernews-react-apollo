@@ -1,18 +1,35 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {BrowserRouter} from 'react-router-dom'
+import {ApolloProvider, ApolloClient, createHttpLink, InMemoryCache} from '@apollo/client'
+import {setContext} from '@apollo/client/link/context'
 import './styles/index.css'
 import App from './components/App'
 import reportWebVitals from './reportWebVitals'
-import {ApolloProvider, ApolloClient, createHttpLink, InMemoryCache} from '@apollo/client'
 
-const httpLink = createHttpLink({uri: 'http://localhost:4000'})
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4000',
+})
 
-const client = new ApolloClient({link: httpLink, cache: new InMemoryCache()})
+const authLink = setContext((_, {headers}) => {
+  const token =
+    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYxMjI5NDkzMH0.NwqjYReyzczoM99_ZHJz9lN2_v09kOBGULANszh1CGQ'
+  return {
+    headers: {
+      ...headers,
+      authorization: token,
+    },
+  }
+})
+
+const client = new ApolloClient({link: authLink.concat(httpLink), cache: new InMemoryCache()})
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>,
+  <BrowserRouter>
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  </BrowserRouter>,
   document.getElementById('root'),
 )
 
