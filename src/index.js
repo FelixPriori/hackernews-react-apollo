@@ -6,18 +6,23 @@ import {setContext} from '@apollo/client/link/context'
 import './styles/index.css'
 import App from './components/App'
 import reportWebVitals from './reportWebVitals'
+import {AUTH_TOKEN} from './constants'
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:4000',
 })
 
+/* 
+  WARNING
+  Storing JWTs in localStorage is not a safe approach to implement authentication on the frontend. 
+  Because this tutorial is focused on GraphQL, we want to keep things simple and therefore are using it here.
+*/
 const authLink = setContext((_, {headers}) => {
-  const token =
-    'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYxMjI5NDkzMH0.NwqjYReyzczoM99_ZHJz9lN2_v09kOBGULANszh1CGQ'
+  const token = localStorage.getItem(AUTH_TOKEN)
   return {
     headers: {
       ...headers,
-      authorization: token,
+      authorization: token ? `Bearer ${token}` : '',
     },
   }
 })
