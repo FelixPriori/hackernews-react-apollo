@@ -14,7 +14,14 @@ function Link({link, index}) {
   const [vote] = useMutation(VOTE_MUTATION, {
     variables: {linkId: link.id},
     update(cache, {data: {vote}}) {
-      const {feed} = cache.readQuery({query: FEED_QUERY})
+      const {feed} = cache.readQuery({
+        query: FEED_QUERY,
+        variables: {
+          take,
+          skip,
+          orderBy,
+        },
+      })
 
       const updatedLinks = feed.links.map((feedLink) => {
         if (feedLink.id === link.id) {
