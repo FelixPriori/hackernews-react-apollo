@@ -1,40 +1,20 @@
 import React from 'react'
-import {useMutation, gql} from '@apollo/client'
-import {AUTH_TOKEN} from '../constants'
+import {useMutation} from '@apollo/client'
+import {AUTH_TOKEN, LINKS_PER_PAGE} from '../constants'
 import {timeDifferenceForDate} from '../utils'
-import {FEED_QUERY} from './LinkList'
-
-const VOTE_MUTATION = gql`
-  mutation VoteMutation($linkId: ID!) {
-    vote(linkId: $linkId) {
-      id
-      link {
-        id
-        votes {
-          id
-          user {
-            id
-          }
-        }
-      }
-      user {
-        id
-      }
-    }
-  }
-`
+import {FEED_QUERY} from '../queries'
+import {VOTE_MUTATION} from '../mutations'
 
 function Link({link, index}) {
   const authToken = localStorage.getItem(AUTH_TOKEN)
+  const take = LINKS_PER_PAGE
+  const skip = 0
+  const orderBy = {createdAt: 'desc'}
 
   const [vote] = useMutation(VOTE_MUTATION, {
-    variables: {
-      linkId: link.id,
-    },
+    variables: {linkId: link.id},
     update(cache, {data: {vote}}) {
-      const {feed} = cache.readQuery({
-        query: FEED_QUERY,
-      })
+      const {feed} = cache.readQuery({query: FEED_QUERY})
 
       const updatedLinks = feed.links.map((feedLink) => {
         if (feedLink.id === link.id) {
@@ -52,6 +32,11 @@ function Link({link, index}) {
           feed: {
             links: updatedLinks,
           },
+        },
+        variables: {
+          take,
+          skip,
+          orderBy,
         },
       })
     },
